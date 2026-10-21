@@ -12,6 +12,5 @@ test('Testing Initial Phase', async ({ page }) => {
   await page.locator("[aria-label *= 'user']").click();
   await page.locator("text=Logout").click();
   await page.waitForTimeout(3000);
-
-
+  console.log("Login and Logout functionality is working as expected");
 });

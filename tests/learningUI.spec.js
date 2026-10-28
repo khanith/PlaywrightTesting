@@ -1,20 +1,44 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
 
-test('Testing Initial Phase', async ({ page }) => {
+
+test.only('Testing Initial Phase', async ({ page,browser }) => {
   await page.goto('https://itms.gctp.in');
   // Expect a title "to contain" a substring.
   await page.locator("[type='email']").fill('test_saikhanith@lnttest.com');
   await page.locator("[type='password']").fill('Password@123');
   await page.click('button:has-text("Login")');
-  await page.waitForTimeout(3000);
-  await page.locator("[aria-label *= 'user']").click();
-  await page.locator("text=Logout").click();
-  await page.waitForTimeout(3000);
-  console.log("Login and Logout functionality is working with playwright");
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(5000);
+ const storage = await page.evaluate(() => ({
+  session: localStorage.getItem('session'),
+  user: localStorage.getItem('user'),
+  userActivities: localStorage.getItem('userActivities')
+}));
+
+
+//Bypassing loggin with storage
+const context = await browser.newContext();
+const newPage = await context.newPage();
+
+await newPage.addInitScript((data) => {
+  if (data.session)
+    localStorage.setItem('session', data.session);
+
+  if (data.user)
+    localStorage.setItem('user', data.user);
+
+  if (data.userActivities)
+    localStorage.setItem('userActivities', data.userActivities);
+}, storage);
+
+await newPage.goto('https://itms.gctp.in');
+
+await newPage.waitForTimeout(3000);
+
 });
 
-test.only('Practiscing E2E flow of E-commerce website', async ({ page })=> {
+test('Practiscing E2E flow of E-commerce website', async ({ page })=> {
  await page.goto('https://rahulshettyacademy.com/client/#/auth/login');
 
 
@@ -92,9 +116,5 @@ await expect(await page.getByText(orderednumber)).toBeVisible();
 console.log("Order id is verified successfully in the order history page");
 await expect(await page.getByText(desiredproduct)).toBeVisible();
 console.log("Desired product is verified successfully in the order history page");
-
 //await page.getByRole('button', { name: 'ORDERS'}).click();
-
-
-
 });

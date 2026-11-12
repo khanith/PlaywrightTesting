@@ -1,7 +1,4 @@
-// @ts-check
 import { test, expect } from '@playwright/test';
-
-
 test.only('Testing Initial Phase', async ({ page,browser }) => {
   await page.goto('https://itms.gctp.in');
   // Expect a title "to contain" a substring.
